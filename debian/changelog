@@ -1,0 +1,5 @@
+lp-connection-editor (0.1) bookworm; urgency=medium
+
+  * Initial release - split out from lxplug-netman
+
+ -- Simon Long <simon@raspberrypi.com>  Tue, 14 Feb 2023 14:46:23 +0000
