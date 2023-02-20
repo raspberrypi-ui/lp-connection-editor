@@ -1,0 +1,6 @@
+*.o
+*.gmo
+Makefile
+Makefile.in
+.dirstamp
+
