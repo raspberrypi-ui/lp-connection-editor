@@ -1,3 +1,9 @@
+lp-connection-editor (0.2) bookworm; urgency=medium
+
+  * Update to network-manager-applet 1.30.0-2
+
+ -- Simon Long <simon@raspberrypi.com>  Fri, 08 Sep 2023 20:36:13 +0100
+
 lp-connection-editor (0.1) bookworm; urgency=medium
 
   * Initial release - split out from lxplug-netman
