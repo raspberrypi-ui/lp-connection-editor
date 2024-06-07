@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Icon for network dialogs
+Icon=network-transmit-receive
+Exec=lp-connection-editor
+NoDisplay=true
