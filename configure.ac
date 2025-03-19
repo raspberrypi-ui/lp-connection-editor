@@ -167,7 +167,7 @@ if test "$enable_debug" = "yes"; then
     #CPPFLAGS="$CPPFLAGS -D_POSIX_C_SOURCE=200112L -D_XOPEN_SOURCE=700"
 else
     # turn off glib debug checks
-    CPPFLAGS="$CPPFLAGS -DG_DISABLE_ASSERT -DG_DISABLE_CHECKS -DG_DISABLE_CAST_CHECKS"
+    CPPFLAGS="$CPPFLAGS -DG_DISABLE_ASSERT -DG_DISABLE_CHECKS -DG_DISABLE_CAST_CHECKS -D_GNU_SOURCE"
 fi
 
 dnl Fix invalid sysconfdir when --prefix=/usr
