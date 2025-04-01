@@ -1,3 +1,9 @@
+lp-connection-editor (0.5) bookworm; urgency=medium
+
+  * Update to network-manager-applet 1.36.0-3
+
+ -- Simon Long <simon@raspberrypi.com>  Tue, 01 Apr 2025 14:39:25 +0100
+
 lp-connection-editor (0.4) bookworm; urgency=medium
 
   * Add GNU_SOURCE flag to fix ppoll warning
