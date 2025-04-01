@@ -269,7 +269,7 @@ parent_changed (GtkWidget *widget, gpointer user_data)
 		gtk_widget_set_sensitive (GTK_WIDGET (priv->mtu), TRUE);
 	} else {
 		gtk_widget_set_sensitive (GTK_WIDGET (priv->cloned_mac), FALSE);
-		ce_page_setup_cloned_mac_combo (priv->cloned_mac, NULL);
+		ce_page_setup_cloned_mac_combo (priv->cloned_mac, NULL, FALSE);
 		gtk_widget_set_sensitive (GTK_WIDGET (priv->mtu), FALSE);
 		gtk_spin_button_set_value (priv->mtu, 1500);
 	}
@@ -516,9 +516,9 @@ populate_ui (CEPageVlan *self)
 	/* Cloned MAC address */
 	if (NM_IS_SETTING_WIRED (priv->s_hw)) {
 		const char *mac = nm_setting_wired_get_cloned_mac_address (NM_SETTING_WIRED (priv->s_hw));
-		ce_page_setup_cloned_mac_combo (priv->cloned_mac, mac);
+		ce_page_setup_cloned_mac_combo (priv->cloned_mac, mac, FALSE);
 	} else {
-		ce_page_setup_cloned_mac_combo (priv->cloned_mac, NULL);
+		ce_page_setup_cloned_mac_combo (priv->cloned_mac, NULL, FALSE);
 	}
 	g_signal_connect (priv->cloned_mac, "changed", G_CALLBACK (stuff_changed), self);
 
@@ -603,7 +603,7 @@ ui_to_setting (CEPageVlan *self)
 	VlanParent *parent = NULL;
 	int active_id, parent_id, vid;
 	const char *parent_iface = NULL, *parent_uuid = NULL;
-	const char *slave_type;
+	const char *port_type;
 	const char *iface;
 	char *tmp_parent_iface = NULL;
 	GType hwtype;
@@ -627,17 +627,17 @@ ui_to_setting (CEPageVlan *self)
 
 	g_assert (parent_uuid != NULL || parent_iface != NULL);
 
-	slave_type = nm_setting_connection_get_slave_type (s_con);
+	port_type = nm_setting_connection_get_slave_type (s_con);
 	if (parent_uuid) {
 		/* Update NMSettingConnection:master if it's set, but don't
 		 * set it if it's not.
 		 */
-		if (!g_strcmp0 (slave_type, NM_SETTING_VLAN_SETTING_NAME)) {
+		if (!g_strcmp0 (port_type, NM_SETTING_VLAN_SETTING_NAME)) {
 			g_object_set (s_con,
 			              NM_SETTING_CONNECTION_MASTER, parent_uuid,
 			              NULL);
 		}
-	} else if (!g_strcmp0 (slave_type, NM_SETTING_VLAN_SETTING_NAME)) {
+	} else if (!g_strcmp0 (port_type, NM_SETTING_VLAN_SETTING_NAME)) {
 		g_object_set (s_con,
 		              NM_SETTING_CONNECTION_MASTER, NULL,
 		              NM_SETTING_CONNECTION_SLAVE_TYPE, NULL,

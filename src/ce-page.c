@@ -262,14 +262,20 @@ ce_page_setup_mac_combo (CEPage *self, GtkComboBox *combo,
 }
 
 void
-ce_page_setup_cloned_mac_combo (GtkComboBoxText *combo, const char *current)
-{
+ce_page_setup_cloned_mac_combo (GtkComboBoxText *combo, const char *current, gboolean is_wifi) {
 	GtkWidget *entry;
-	static const char *entries[][2] = { { "preserve",  N_("Preserve") },
-	                                    { "permanent", N_("Permanent") },
-	                                    { "random",    N_("Random") },
-	                                    { "stable",    N_("Stable") } };
+	static const char *entries_wired[][2] = {{"preserve", N_ ("Preserve")},
+	                                         {"permanent", N_ ("Permanent")},
+	                                         {"random", N_ ("Random")},
+	                                         {"stable", N_ ("Stable")}};
+	static const char *entries_wifi[][2] = {{"preserve", N_ ("Preserve")},
+	                                        {"permanent", N_ ("Permanent")},
+	                                        {"random", N_ ("Random")},
+	                                        {"stable", N_ ("Stable")},
+	                                        {"stable-ssid", N_ ("Stable per SSID")}};
 	int i, active = -1;
+	const char *(*entries)[2] = is_wifi ? entries_wifi : entries_wired;
+	gsize n_entries = is_wifi ? G_N_ELEMENTS (entries_wifi) : G_N_ELEMENTS (entries_wired);
 
 	gtk_widget_set_tooltip_text (GTK_WIDGET (combo),
 		_("The MAC address entered here will be used as hardware address for "
@@ -278,7 +284,7 @@ ce_page_setup_cloned_mac_combo (GtkComboBoxText *combo, const char *current)
 
 	gtk_combo_box_text_remove_all (combo);
 
-	for (i = 0; i < G_N_ELEMENTS (entries); i++) {
+	for (i = 0; i < n_entries; i++) {
 		gtk_combo_box_text_append (combo, entries[i][0], _(entries[i][1]));
 		if (nm_streq0 (current, entries[i][0]))
 			active = i;
@@ -859,8 +865,6 @@ ce_page_complete_connection (NMConnection *connection,
                              NMClient *client)
 {
 	NMSettingConnection *s_con;
-	char *id, *uuid;
-	const GPtrArray *connections;
 
 	s_con = nm_connection_get_setting_connection (connection);
 	if (!s_con) {
@@ -869,19 +873,25 @@ ce_page_complete_connection (NMConnection *connection,
 	}
 
 	if (!nm_setting_connection_get_id (s_con)) {
+		const GPtrArray *connections;
+		gs_free char *id = NULL;
+
 		connections = nm_client_get_connections (client);
 		id = ce_page_get_next_available_name (connections, format);
 		g_object_set (s_con, NM_SETTING_CONNECTION_ID, id, NULL);
-		g_free (id);
 	}
 
-	uuid = nm_utils_uuid_generate ();
-	g_object_set (s_con,
-	              NM_SETTING_CONNECTION_UUID, uuid,
-	              NM_SETTING_CONNECTION_TYPE, ctype,
-	              NM_SETTING_CONNECTION_AUTOCONNECT, autoconnect,
-	              NULL);
-	g_free (uuid);
+	if (!nm_setting_connection_get_uuid (s_con)) {
+		gs_free char *uuid = NULL;
+
+		uuid = nm_utils_uuid_generate ();
+		g_object_set (s_con, NM_SETTING_CONNECTION_UUID, uuid, NULL);
+	}
+
+	if (ctype)
+		g_object_set (s_con, NM_SETTING_CONNECTION_TYPE, ctype, NULL);
+
+	g_object_set (s_con, NM_SETTING_CONNECTION_AUTOCONNECT, autoconnect, NULL);
 }
 
 CEPage *
